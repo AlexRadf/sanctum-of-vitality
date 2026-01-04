@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Sanctum of Vitality</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --blood-red: #8b1a1a;
+            --dark-red: #5a0f0f;
+            --gold: #d4af37;
+            --bronze: #a67c52;
+            --charcoal: #1a1614;
+            --stone: #2a2520;
+            --dark-stone: #1f1b18;
+            --light-text: #e8dcc4;
+            --glow-gold: #ffd700;
+            --glow-red: #ff4444;
+        }
+
+        body {
+            font-family: 'Crimson Text', serif;
+            background: linear-gradient(to bottom, #0a0806, #1a1614);
+            color: var(--light-text);
+            min-height: 100vh;
+            padding: 20px;
+            background-image: 
+                radial-gradient(ellipse at top, rgba(139, 26, 26, 0.1), transparent 50%),
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" /></filter><rect width="100" height="100" filter="url(%23noise)" opacity="0.05"/></svg>');
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, var(--dark-stone), var(--stone));
+            border: 3px solid var(--bronze);
+            border-radius: 4px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(212, 175, 55, 0.2);
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        .season-title {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: 3em;
+            font-weight: 900;
+            color: var(--gold);
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5), 0 4px 8px rgba(0, 0, 0, 0.8);
+            letter-spacing: 3px;
+            margin-bottom: 15px;
+        }
+
+        .season-quote {
+            font-style: italic;
+            font-size: 1.2em;
+            color: var(--bronze);
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .blessings {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .blessing {
+            background: linear-gradient(135deg, var(--dark-red), var(--blood-red));
+            border: 2px solid var(--bronze);
+            border-radius: 4px;
+            padding: 15px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+        }
+
+        .blessing-title {
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            color: var(--gold);
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+
+        .blessing-text {
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .characters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+
+        .character-selector {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+            background: linear-gradient(to bottom, #0a0806, rgba(26, 22, 20, 0.95));
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .character-select-btn {
+            font-family: 'Cinzel', serif;
+            font-size: 1.1em;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, var(--stone), var(--dark-stone));
+            border: 2px solid var(--bronze);
+            border-radius: 4px;
+            color: var(--light-text);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .character-select-btn:hover {
+            border-color: var(--gold);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .character-select-btn.active {
+            background: linear-gradient(135deg, var(--blood-red), var(--dark-red));
+            border-color: var(--gold);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+            color: var(--gold);
+        }
+
+        .character-card.hidden {
+            display: none;
+        }
+
+        .character-card {
+            background: linear-gradient(135deg, var(--dark-stone), var(--stone));
+            border: 3px solid var(--blood-red);
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+        }
+
+        .character-header {
+            padding: 20px;
+            background: linear-gradient(135deg, var(--blood-red), var(--dark-red));
+            cursor: pointer;
+            user-select: none;
+            border-bottom: 2px solid var(--gold);
+            transition: all 0.3s ease;
+        }
+
+        .character-header:hover {
+            background: linear-gradient(135deg, #a01f1f, var(--blood-red));
+        }
+
+        .character-name {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: 1.8em;
+            font-weight: 700;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+        }
+
+        .character-class {
+            font-family: 'Cinzel', serif;
+            font-size: 1.1em;
+            color: var(--bronze);
+            margin-top: 5px;
+        }
+
+        .character-body {
+            padding: 20px;
+            display: none;
+        }
+
+        .character-body.active {
+            display: block;
+        }
+
+        .character-section {
+            margin-bottom: 15px;
+        }
+
+        .character-label {
+            font-family: 'Cinzel', serif;
+            font-weight: 600;
+            color: var(--gold);
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .character-text {
+            font-size: 1em;
+            line-height: 1.6;
+            color: var(--light-text);
+        }
+
+        .chapters {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .chapter {
+            background: linear-gradient(135deg, var(--dark-stone), var(--charcoal));
+            border: 3px solid var(--bronze);
+            border-radius: 4px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+            position: relative;
+        }
+
+        .chapter::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--blood-red), transparent);
+        }
+
+        .chapter-header {
+            margin-bottom: 20px;
+        }
+
+        .chapter-title {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: 2em;
+            font-weight: 700;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+            margin-bottom: 10px;
+        }
+
+        .chapter-flavor {
+            font-style: italic;
+            color: var(--bronze);
+            font-size: 1.1em;
+        }
+
+        .progress-container {
+            background: var(--charcoal);
+            border: 2px solid var(--bronze);
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 25px;
+        }
+
+        .progress-text {
+            font-family: 'Cinzel', serif;
+            font-size: 1em;
+            color: var(--gold);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .progress-bar-bg {
+            background: var(--dark-stone);
+            border: 3px solid var(--bronze);
+            border-radius: 4px;
+            height: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(135deg, var(--gold), var(--bronze));
+            transition: width 0.5s ease;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.8);
+            position: relative;
+        }
+
+        .progress-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+        }
+
+        .objectives {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .objective {
+            background: var(--stone);
+            border: 2px solid var(--bronze);
+            border-radius: 4px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .objective::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--blood-red);
+        }
+
+        .objective.completed {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(139, 26, 26, 0.2));
+            border-color: var(--gold);
+        }
+
+        .objective.completed::before {
+            background: var(--gold);
+        }
+
+        .checkbox-container {
+            position: relative;
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+        }
+
+        .checkbox {
+            appearance: none;
+            width: 32px;
+            height: 32px;
+            background: var(--dark-stone);
+            border: 3px solid var(--bronze);
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox:hover {
+            border-color: var(--gold);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .checkbox:checked {
+            background: linear-gradient(135deg, var(--gold), var(--bronze));
+            border-color: var(--gold);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.8);
+        }
+
+        .checkbox:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--charcoal);
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .objective-text {
+            flex: 1;
+            font-size: 1.05em;
+            line-height: 1.5;
+        }
+
+        .objective-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            font-family: 'Cinzel', serif;
+            font-size: 0.75em;
+            padding: 4px 10px;
+            border-radius: 3px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tag.normal { background: #4a5568; color: #e2e8f0; }
+        .tag.veteran { background: #2d5f3f; color: #9ae6b4; }
+        .tag.nightmare { background: #742a2a; color: #feb2b2; }
+        .tag.hardcore { background: #44337a; color: #d6bcfa; }
+        .tag.shared { background: #2c5282; color: #90cdf4; }
+        .tag.class { background: #975a16; color: #fbd38d; }
+        .tag.alex { background: #1a365d; color: #90cdf4; }
+        .tag.katie { background: #22543d; color: #9ae6b4; }
+
+        .special-block {
+            background: linear-gradient(135deg, var(--blood-red), var(--dark-red));
+            border: 3px solid var(--gold);
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .special-block.locked {
+            background: linear-gradient(135deg, var(--dark-stone), var(--charcoal));
+            border-color: #4a4a4a;
+            opacity: 0.6;
+        }
+
+        .special-block.locked::before {
+            content: '🔒';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4em;
+            opacity: 0.3;
+            z-index: 1;
+        }
+
+        .special-block.locked .special-content {
+            filter: blur(3px);
+            user-select: none;
+        }
+
+        .lock-message {
+            text-align: center;
+            font-family: 'Cinzel', serif;
+            color: var(--bronze);
+            font-size: 0.9em;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        .special-title {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: 1.5em;
+            color: var(--gold);
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .special-content {
+            font-size: 1.05em;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .capstone-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .capstone-option {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-left: 3px solid var(--bronze);
+            border-radius: 3px;
+        }
+
+        @media (max-width: 768px) {
+            .season-title {
+                font-size: 2em;
+            }
+
+            .characters {
+                grid-template-columns: 1fr;
+            }
+
+            .blessings {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="season-title">Season of Vitality</h1>
+            <p class="season-quote"></p>
+        </div>
+
+        <div class="character-selector">
+            <button class="character-select-btn active" onclick="selectCharacter('Alex')">Alex - Monk</button>
+            <button class="character-select-btn" onclick="selectCharacter('Katie')">Katie - Spiritborn</button>
+        </div>
+        <div class="blessings" id="blessings"></div>
+        <div class="characters" id="characters"></div>
+        <div class="chapters" id="chapters"></div>
+    </div>
+
+    <script>
+        const seasonData = {
+            seasonTitle: "Season of Vitality",
+            seasonQuote: "The body is a vessel. The mind, its will. Strength is not seized in a single battle, but earned through countless small victories.",
+            blessings: [
+                { title: "Grace of Moderation", text: "Skip/swap 1 objective per chapter with no penalty." },
+                { title: "Shared Resolve", text: "Completing shared objective counts as ½ progress toward one personal objective." },
+                { title: "Restoration", text: "Miss a day? No streaks broken. Resume without punishment." },
+                { title: "Mercy of the Healers", text: "If flare-ups occur, resting counts as progress once per week." }
+            ],
+            characters: [
+                {
+                    name: "Alex",
+                    classTitle: "Monk: Way of the Flowing Fist",
+                    fantasy: "Discipline, breath, controlled power.",
+                    passive: "Flow State: Completing an exercise session grants +1 bonus progress to any shared goal that week.",
+                    keystone: "The Still Mind: Complete a full session (movement + cooldown) with no distractions."
+                },
+                {
+                    name: "Katie",
+                    classTitle: "Spiritborn: Path of the Verdant Calm",
+                    fantasy: "Nature-bound, intuitive, resilient.",
+                    passive: "Natural Rhythm: Walking, stretching, or rest days can replace any one exercise objective per chapter.",
+                    keystone: "The Listening Body: Stop an activity early on purpose and count it as success."
+                }
+            ],
+            chapters: [
+                {
+                    id: "chap1",
+                    title: "Chapter I – Awakening",
+                    flavor: "The first steps are taken. The body remembers movement.",
+                    requiredForProgress: 5,
+                    reward: "Choose a shared cozy reward (movie night, long lie-in, or favourite takeaway).",
+                    capstone: { title: "The First Stance", options: ["Hold Chair Pose 30s", "10 supported squats", "Mountain Pose 2 mins"] },
+                    objectives: [
+                        { id: "c1_1", text: "Walk for 10+ minutes on 5 separate days", tags: ["Normal", "Shared"] },
+                        { id: "c1_2", text: "Drink 6+ glasses of water in a day, 3 times", tags: ["Normal", "Shared"] },
+                        { id: "c1_3", text: "Read 10 pages on 3 days", tags: ["Normal", "Shared"] },
+                        { id: "c1_4", text: "Go to bed 15 mins earlier than usual, twice", tags: ["Normal", "Shared"] },
+                        { id: "c1_5", text: "Do any movement together once (stretching counts)", tags: ["Normal", "Shared"] },
+                        { id: "c1_6", text: "Spend 30 minutes on a hobby", tags: ["Normal", "Shared"] },
+                        { id: "c1_7", text: "Intentional physical closeness once", tags: ["Normal", "Shared"] },
+                        { id: "c1_alex", text: "Monk: Complete an exercise session start to finish", tags: ["Class", "Alex"] },
+                        { id: "c1_katie", text: "Spiritborn: Walk outdoors with intentional awareness", tags: ["Class", "Katie"] }
+                    ]
+                },
+                {
+                    id: "chap2",
+                    title: "Chapter II – Strengthening",
+                    flavor: "Routine begins to form. Muscles ache. Spirits lift.",
+                    requiredForProgress: 6,
+                    reward: "New shared ritual (weekly walk route, tea before bed, or stretch playlist).",
+                    capstone: { title: "Roots in Motion", options: ["Hold Warrior I or II 20s/side", "15 squats", "Wall Sit 30s"] },
+                    objectives: [
+                        { id: "c2_1", text: "Walk for 20+ minutes on 5 days", tags: ["Veteran", "Shared"] },
+                        { id: "c2_2", text: "Drink 8 glasses of water in a day, 3 times", tags: ["Veteran", "Shared"] },
+                        { id: "c2_3", text: "Cook one meal focused on nourishment together", tags: ["Veteran", "Shared"] },
+                        { id: "c2_4", text: "Exercise together twice (yoga, meditation, calisthenics)", tags: ["Veteran", "Shared"] },
+                        { id: "c2_5", text: "Read 30 total pages across the week", tags: ["Veteran", "Shared"] },
+                        { id: "c2_6", text: "Begin a wind-down routine before bed on 3 nights", tags: ["Veteran", "Shared"] },
+                        { id: "c2_7", text: "Schedule intentional intimacy time", tags: ["Veteran", "Shared"] },
+                        { id: "c2_alex", text: "Monk: Maintain steady breathing during movement", tags: ["Class", "Alex"] },
+                        { id: "c2_katie", text: "Spiritborn: Complete movement staying below dizziness threshold", tags: ["Class", "Katie"] }
+                    ]
+                },
+                {
+                    id: "chap3",
+                    title: "Chapter III – Commitment",
+                    flavor: "The body adapts. The mind resists. Discipline whispers.",
+                    requiredForProgress: 6,
+                    reward: "Small upgrade (candles, yoga mat, book, hobby supply).",
+                    capstone: { title: "The Steady Path", options: ["Hold Tree Pose 20s/side", "20 squats", "Glute Bridge 30s twice"] },
+                    objectives: [
+                        { id: "c3_1", text: "Walk 30+ minutes on 5 days", tags: ["Veteran", "Shared"] },
+                        { id: "c3_2", text: "Track water intake for 5 consecutive days", tags: ["Veteran", "Shared"] },
+                        { id: "c3_3", text: "Exercise together 3 times in one week", tags: ["Veteran", "Shared"] },
+                        { id: "c3_4", text: "Maintain consistent bedtime window for 4 nights", tags: ["Veteran", "Shared"] },
+                        { id: "c3_5", text: "Read on 5 separate days", tags: ["Veteran", "Shared"] },
+                        { id: "c3_6", text: "Hobby time twice in one week", tags: ["Veteran", "Shared"] },
+                        { id: "c3_7", text: "Have sex or intimate exploration twice", tags: ["Nightmare", "Shared"] },
+                        { id: "c3_alex", text: "Monk: Finish a planned routine even when motivation dips", tags: ["Class", "Alex"] },
+                        { id: "c3_katie", text: "Spiritborn: Choose rest before exhaustion", tags: ["Class", "Katie"] }
+                    ]
+                },
+                {
+                    id: "chap4",
+                    title: "Chapter IV – Mastery",
+                    flavor: "Strength is no longer forced. It is chosen.",
+                    requiredForProgress: 6,
+                    reward: "Date night or experience (massage, class, or long countryside walk).",
+                    capstone: { title: "Flow of Power", options: ["Warrior II to Reverse Warrior flow 60s", "30 squats across day", "Hold Chair Pose 45s"] },
+                    objectives: [
+                        { id: "c4_1", text: "Walk 150 total minutes in one week", tags: ["Nightmare", "Shared"] },
+                        { id: "c4_2", text: "Drink 8+ glasses of water for 5 days", tags: ["Nightmare", "Shared"] },
+                        { id: "c4_3", text: "Exercise together 4 times in one week", tags: ["Nightmare", "Shared"] },
+                        { id: "c4_4", text: "Read 100 pages across the week", tags: ["Nightmare", "Shared"] },
+                        { id: "c4_5", text: "Maintain bedtime routine 5 nights", tags: ["Nightmare", "Shared"] },
+                        { id: "c4_6", text: "Plan and complete a screen-free evening", tags: ["Nightmare", "Shared"] },
+                        { id: "c4_7", text: "Initiate intimacy without planning", tags: ["Nightmare", "Shared"] },
+                        { id: "c4_alex", text: "Monk: Lead one shared movement session", tags: ["Class", "Alex"] },
+                        { id: "c4_katie", text: "Spiritborn: Pair movement with music or nature", tags: ["Class", "Katie"] }
+                    ]
+                },
+                {
+                    id: "chap5",
+                    title: "Slayer",
+                    flavor: "The season begins to fight back.",
+                    requiredForProgress: 5,
+                    reward: null,
+                    capstone: { title: "Trial of the Body", options: ["3 exercise sessions in one week", "Wall Sit 60s", "Tree Pose 30s/side"] },
+                    objectives: [
+                        { id: "c5_1", text: "Walk 200+ minutes in a week", tags: ["Nightmare", "Shared"] },
+                        { id: "c5_2", text: "Exercise together 5 times", tags: ["Nightmare", "Shared"] },
+                        { id: "c5_3", text: "7-day water awareness streak", tags: ["Nightmare", "Shared"] },
+                        { id: "c5_4", text: "Read daily for a week", tags: ["Nightmare", "Shared"] },
+                        { id: "c5_5", text: "Maintain sleep routine 6 nights", tags: ["Nightmare", "Shared"] },
+                        { id: "c5_6", text: "3 intimacy moments in one week", tags: ["Nightmare", "Shared"] },
+                        { id: "c5_alex", text: "Monk: Complete a capstone without rushing", tags: ["Class", "Alex"] },
+                        { id: "c5_katie", text: "Spiritborn: Complete a capstone over multiple gentle attempts", tags: ["Class", "Katie"] }
+                    ]
+                },
+                {
+                    id: "chap6",
+                    title: "Champion",
+                    flavor: "You move differently now. The change is visible.",
+                    requiredForProgress: 4,
+                    reward: null,
+                    capstone: { title: "Discipline Refined", options: ["5 exercise sessions in one week", "Warrior II 45s/side", "40 squats across day"] },
+                    objectives: [
+                        { id: "c6_1", text: "Exercise together 6 times in a week", tags: ["Nightmare", "Shared"] },
+                        { id: "c6_2", text: "Walk 250+ minutes", tags: ["Nightmare", "Shared"] },
+                        { id: "c6_3", text: "Maintain bedtime routine all week", tags: ["Nightmare", "Shared"] },
+                        { id: "c6_4", text: "Read 150 pages", tags: ["Nightmare", "Shared"] },
+                        { id: "c6_5", text: "Schedule and complete a deep rest day", tags: ["Nightmare", "Shared"] }
+                    ]
+                },
+                {
+                    id: "chap7",
+                    title: "Destroyer",
+                    flavor: "The season bends. You do not.",
+                    requiredForProgress: 3,
+                    reward: "Season Completion Reward: A shared experience you'll remember.",
+                    capstone: { title: "Mastery of the Vessel (Hardcore)", options: ["7 consecutive days movement", "Chair Pose 60s", "Flow through 3 yoga poses nonstop"] },
+                    objectives: [
+                        { id: "c7_1", text: "Walk 300+ minutes", tags: ["Hardcore", "Shared"] },
+                        { id: "c7_2", text: "Exercise together daily for 7 days", tags: ["Hardcore", "Shared"] },
+                        { id: "c7_3", text: "Perfect sleep routine for a full week", tags: ["Hardcore", "Shared"] },
+                        { id: "c7_4", text: "Daily water + movement + reading for 7 days", tags: ["Hardcore", "Shared"] }
+                    ]
+                }
+            ]
+        };
+
+        // State management
+        const state = {
+            objectives: {},
+            load() {
+                const saved = localStorage.getItem('sanctumState');
+                if (saved) {
+                    this.objectives = JSON.parse(saved);
+                }
+            },
+            save() {
+                localStorage.setItem('sanctumState', JSON.stringify(this.objectives));
+            },
+            toggle(id) {
+                this.objectives[id] = !this.objectives[id];
+                this.save();
+            },
+            isComplete(id) {
+                return !!this.objectives[id];
+            }
+        };
+
+        // Initialize
+        function init() {
+            state.load();
+            renderQuote();
+            renderBlessings();
+            renderCharacters();
+            renderChapters();
+        }
+
+        function renderQuote() {
+            document.querySelector('.season-quote').textContent = seasonData.seasonQuote;
+        }
+
+        function renderBlessings() {
+            const container = document.getElementById('blessings');
+            container.innerHTML = seasonData.blessings.map(b => `
+                <div class="blessing">
+                    <div class="blessing-title">${b.title}</div>
+                    <div class="blessing-text">${b.text}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderCharacters() {
+            const container = document.getElementById('characters');
+            container.innerHTML = seasonData.characters.map((c, i) => `
+                <div class="character-card ${i === 0 ? '' : 'hidden'}" id="card-${c.name}">
+                    <div class="character-header" onclick="toggleCharacter('${c.name}')">
+                        <div class="character-name">${c.name}</div>
+                        <div class="character-class">${c.classTitle}</div>
+                    </div>
+                    <div class="character-body active" id="char-${c.name}">
+                        <div class="character-section">
+                            <div class="character-label">Fantasy</div>
+                            <div class="character-text">${c.fantasy}</div>
+                        </div>
+                        <div class="character-section">
+                            <div class="character-label">Passive Ability</div>
+                            <div class="character-text">${c.passive}</div>
+                        </div>
+                        <div class="character-section">
+                            <div class="character-label">Keystone</div>
+                            <div class="character-text">${c.keystone}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectCharacter(name) {
+            // Update button states
+            document.querySelectorAll('.character-select-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Show only selected character card
+            document.querySelectorAll('.character-card').forEach(card => {
+                card.classList.add('hidden');
+            });
+            document.getElementById(`card-${name}`).classList.remove('hidden');
+        }
+
+        function toggleCharacter(name) {
+            const body = document.getElementById(`char-${name}`);
+            body.classList.toggle('active');
+        }
+
+        function renderChapters() {
+            const container = document.getElementById('chapters');
+            container.innerHTML = seasonData.chapters.map(ch => {
+                const completed = ch.objectives.filter(obj => state.isComplete(obj.id)).length;
+                const total = ch.objectives.length;
+                const percentage = (completed / total) * 100;
+                const isCapstoneUnlocked = completed >= ch.requiredForProgress;
+
+                return `
+                    <div class="chapter">
+                        <div class="chapter-header">
+                            <h2 class="chapter-title">${ch.title}</h2>
+                            <p class="chapter-flavor">${ch.flavor}</p>
+                        </div>
+
+                        <div class="progress-container">
+                            <div class="progress-text">${completed} / ${total} Objectives Complete</div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width: ${percentage}%"></div>
+                            </div>
+                        </div>
+
+                        <div class="objectives">
+                            ${ch.objectives.map(obj => `
+                                <div class="objective ${state.isComplete(obj.id) ? 'completed' : ''}" data-id="${obj.id}">
+                                    <div class="checkbox-container">
+                                        <input 
+                                            type="checkbox" 
+                                            class="checkbox" 
+                                            id="${obj.id}"
+                                            ${state.isComplete(obj.id) ? 'checked' : ''}
+                                            onchange="handleCheckbox('${obj.id}')"
+                                        >
+                                    </div>
+                                    <div class="objective-text">${obj.text}</div>
+                                    <div class="objective-tags">
+                                        ${obj.tags.map(tag => `
+                                            <span class="tag ${tag.toLowerCase()}">${tag}</span>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <div class="special-block ${isCapstoneUnlocked ? '' : 'locked'}" data-chapter="${ch.id}">
+                            <div class="special-title">${ch.capstone.title}</div>
+                            <div class="special-content">
+                                <div class="capstone-options">
+                                    ${ch.capstone.options.map(opt => `
+                                        <div class="capstone-option">${opt}</div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            ${!isCapstoneUnlocked ? `
+                                <div class="lock-message">Complete ${ch.requiredForProgress} objectives to unlock</div>
+                            ` : ''}
+                        </div>
+
+                        ${ch.reward ? `
+                            <div class="special-block">
+                                <div class="special-title">Chapter Reward</div>
+                                <div class="special-content">${ch.reward}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function handleCheckbox(id) {
+            state.toggle(id);
+            const objective = document.querySelector(`[data-id="${id}"]`);
+            objective.classList.toggle('completed');
+            
+            // Find parent chapter by looking at the objective's chapter
+            // Extract chapter id from objective id (e.g., "c1_1" -> "chap1")
+            const chapterMatch = id.match(/^c(\d+)_/);
+            if (chapterMatch) {
+                const chapterNum = chapterMatch[1];
+                const chapterId = `chap${chapterNum}`;
+                const chapter = seasonData.chapters.find(ch => ch.id === chapterId);
+                
+                if (chapter) {
+                    const completed = chapter.objectives.filter(obj => state.isComplete(obj.id)).length;
+                    const total = chapter.objectives.length;
+                    const percentage = (completed / total) * 100;
+                    const isCapstoneUnlocked = completed >= chapter.requiredForProgress;
+                    
+                    const chapterEl = objective.closest('.chapter');
+                    const progressText = chapterEl.querySelector('.progress-text');
+                    const progressBar = chapterEl.querySelector('.progress-bar-fill');
+                    const capstone = chapterEl.querySelector(`[data-chapter="${chapterId}"]`);
+                    
+                    progressText.textContent = `${completed} / ${total} Objectives Complete`;
+                    progressBar.style.width = `${percentage}%`;
+                    
+                    // Update capstone lock state
+                    if (isCapstoneUnlocked) {
+                        capstone.classList.remove('locked');
+                        const lockMsg = capstone.querySelector('.lock-message');
+                        if (lockMsg) lockMsg.remove();
+                    } else {
+                        capstone.classList.add('locked');
+                        if (!capstone.querySelector('.lock-message')) {
+                            const lockMsg = document.createElement('div');
+                            lockMsg.className = 'lock-message';
+                            lockMsg.textContent = `Complete ${chapter.requiredForProgress} objectives to unlock`;
+                            capstone.appendChild(lockMsg);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Start the app
+        init();
+    </script>
+</body>
+</html>
