@@ -29,13 +29,45 @@
 
         body {
             font-family: 'Crimson Text', serif;
-            background: linear-gradient(to bottom, #0a0806, #1a1614);
+            background: #0a0806;
             color: var(--light-text);
             min-height: 100vh;
             padding: 20px;
             background-image: 
-                radial-gradient(ellipse at top, rgba(139, 26, 26, 0.1), transparent 50%),
-                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" /></filter><rect width="100" height="100" filter="url(%23noise)" opacity="0.05"/></svg>');
+                radial-gradient(circle at 50% 50%, transparent 30%, rgba(139, 26, 26, 0.15) 31%, transparent 32%),
+                radial-gradient(circle at 50% 50%, transparent 45%, rgba(80, 20, 20, 0.1) 46%, transparent 47%),
+                radial-gradient(circle at 50% 50%, transparent 60%, rgba(60, 15, 15, 0.08) 61%, transparent 62%),
+                repeating-conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(100, 100, 100, 0.02) 15deg, transparent 30deg),
+                repeating-conic-gradient(from 45deg at 50% 50%, transparent 0deg, rgba(80, 80, 80, 0.03) 10deg, transparent 20deg),
+                linear-gradient(135deg, rgba(40, 40, 40, 0.1) 0%, transparent 30%, transparent 70%, rgba(30, 30, 30, 0.15) 100%),
+                linear-gradient(225deg, rgba(50, 50, 50, 0.08) 0%, transparent 40%, transparent 60%, rgba(40, 40, 40, 0.12) 100%),
+                radial-gradient(ellipse at 20% 80%, rgba(139, 26, 26, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(100, 20, 20, 0.12) 0%, transparent 50%),
+                linear-gradient(180deg, #000000 0%, #1a1614 50%, #0a0806 100%);
+            background-attachment: fixed;
+            background-size: 100% 100%, 100% 100%, 100% 100%, 200% 200%, 300% 300%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                repeating-linear-gradient(0deg, transparent 0px, rgba(100, 100, 100, 0.02) 1px, transparent 2px, transparent 40px),
+                repeating-linear-gradient(90deg, transparent 0px, rgba(100, 100, 100, 0.02) 1px, transparent 2px, transparent 40px),
+                repeating-linear-gradient(45deg, transparent 0px, rgba(80, 20, 20, 0.03) 1px, transparent 2px, transparent 60px),
+                repeating-linear-gradient(-45deg, transparent 0px, rgba(80, 20, 20, 0.03) 1px, transparent 2px, transparent 60px);
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 2;
         }
 
         .container {
@@ -440,6 +472,35 @@
             background: linear-gradient(135deg, var(--dark-stone), var(--charcoal));
             border-color: #4a4a4a;
             opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .special-block.unlocked {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .special-block.unlocked:hover {
+            border-color: var(--glow-gold);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .special-block.completed {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(139, 26, 26, 0.3));
+            border-color: var(--glow-gold);
+        }
+
+        .special-block.completed::after {
+            content: '✓ COMPLETED';
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-family: 'Cinzel', serif;
+            font-size: 0.9em;
+            color: var(--gold);
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.8);
         }
 
         .special-block.locked::before {
@@ -683,14 +744,20 @@
         // State management
         const state = {
             objectives: {},
+            capstones: {},
             load() {
                 const saved = localStorage.getItem('sanctumState');
                 if (saved) {
-                    this.objectives = JSON.parse(saved);
+                    const data = JSON.parse(saved);
+                    this.objectives = data.objectives || {};
+                    this.capstones = data.capstones || {};
                 }
             },
             save() {
-                localStorage.setItem('sanctumState', JSON.stringify(this.objectives));
+                localStorage.setItem('sanctumState', JSON.stringify({
+                    objectives: this.objectives,
+                    capstones: this.capstones
+                }));
             },
             toggle(id) {
                 this.objectives[id] = !this.objectives[id];
@@ -698,6 +765,13 @@
             },
             isComplete(id) {
                 return !!this.objectives[id];
+            },
+            completeCapstone(chapterId) {
+                this.capstones[chapterId] = true;
+                this.save();
+            },
+            isCapstoneComplete(chapterId) {
+                return !!this.capstones[chapterId];
             }
         };
 
@@ -771,17 +845,37 @@
 
         function renderChapters() {
             const container = document.getElementById('chapters');
-            container.innerHTML = seasonData.chapters.map(ch => {
+            container.innerHTML = seasonData.chapters.map((ch, index) => {
                 const completed = ch.objectives.filter(obj => state.isComplete(obj.id)).length;
                 const total = ch.objectives.length;
                 const percentage = (completed / total) * 100;
                 const isCapstoneUnlocked = completed >= ch.requiredForProgress;
+                const isCapstoneComplete = state.isCapstoneComplete(ch.id);
+                
+                // Check if previous chapter's capstone is complete (for locking chapters)
+                const prevChapter = index > 0 ? seasonData.chapters[index - 1] : null;
+                const isPrevCapstoneComplete = !prevChapter || state.isCapstoneComplete(prevChapter.id);
+                
+                // Determine chapter lock state
+                let chapterClass = '';
+                if (!isPrevCapstoneComplete) {
+                    // Check if this is the next chapter after the current one
+                    const currentChapterIndex = seasonData.chapters.findIndex((c, i) => 
+                        i === 0 || state.isCapstoneComplete(seasonData.chapters[i - 1].id)
+                    );
+                    if (index === currentChapterIndex + 1) {
+                        chapterClass = 'next-locked-chapter'; // Show preview of next chapter
+                    } else {
+                        chapterClass = 'locked-chapter'; // Completely hide further chapters
+                    }
+                }
 
                 return `
-                    <div class="chapter">
+                    <div class="chapter ${chapterClass}" data-chapter-id="${ch.id}">
                         <div class="chapter-header">
                             <h2 class="chapter-title">${ch.title}</h2>
                             <p class="chapter-flavor">${ch.flavor}</p>
+                            ${chapterClass === 'next-locked-chapter' ? `<p class="lock-message" style="color: var(--bronze); font-size: 1.1em; margin-top: 10px;">Complete the previous chapter's capstone to unlock</p>` : ''}
                         </div>
 
                         <div class="progress-container">
@@ -800,6 +894,7 @@
                                             class="checkbox" 
                                             id="${obj.id}"
                                             ${state.isComplete(obj.id) ? 'checked' : ''}
+                                            ${chapterClass ? 'disabled' : ''}
                                             onchange="handleCheckbox('${obj.id}')"
                                         >
                                     </div>
@@ -813,7 +908,9 @@
                             `).join('')}
                         </div>
 
-                        <div class="special-block ${isCapstoneUnlocked ? '' : 'locked'}" data-chapter="${ch.id}">
+                        <div class="special-block ${isCapstoneUnlocked && !chapterClass ? 'unlocked' : 'locked'} ${isCapstoneComplete ? 'completed' : ''}" 
+                             data-chapter="${ch.id}"
+                             ${isCapstoneUnlocked && !isCapstoneComplete && !chapterClass ? `onclick="completeCapstone('${ch.id}')"` : ''}>
                             <div class="special-title">${ch.capstone.title}</div>
                             <div class="special-content">
                                 <div class="capstone-options">
@@ -822,8 +919,11 @@
                                     `).join('')}
                                 </div>
                             </div>
-                            ${!isCapstoneUnlocked ? `
-                                <div class="lock-message">Complete ${ch.requiredForProgress} objectives to unlock</div>
+                            ${!isCapstoneUnlocked || chapterClass ? `
+                                <div class="lock-message">${chapterClass ? 'Complete previous capstone first' : `Complete ${ch.requiredForProgress} objectives to unlock`}</div>
+                            ` : ''}
+                            ${isCapstoneUnlocked && !isCapstoneComplete && !chapterClass ? `
+                                <div class="lock-message" style="color: var(--gold);">Click to complete capstone and unlock next chapter</div>
                             ` : ''}
                         </div>
 
@@ -856,6 +956,7 @@
                     const total = chapter.objectives.length;
                     const percentage = (completed / total) * 100;
                     const isCapstoneUnlocked = completed >= chapter.requiredForProgress;
+                    const isCapstoneComplete = state.isCapstoneComplete(chapterId);
                     
                     const chapterEl = objective.closest('.chapter');
                     const progressText = chapterEl.querySelector('.progress-text');
@@ -866,12 +967,25 @@
                     progressBar.style.width = `${percentage}%`;
                     
                     // Update capstone lock state
-                    if (isCapstoneUnlocked) {
+                    if (isCapstoneUnlocked && !isCapstoneComplete) {
                         capstone.classList.remove('locked');
-                        const lockMsg = capstone.querySelector('.lock-message');
-                        if (lockMsg) lockMsg.remove();
-                    } else {
+                        capstone.classList.add('unlocked');
+                        capstone.onclick = () => completeCapstone(chapterId);
+                        capstone.innerHTML = `
+                            <div class="special-title">${chapter.capstone.title}</div>
+                            <div class="special-content">
+                                <div class="capstone-options">
+                                    ${chapter.capstone.options.map(opt => `
+                                        <div class="capstone-option">${opt}</div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <div class="lock-message" style="color: var(--gold);">Click to complete capstone and unlock next chapter</div>
+                        `;
+                    } else if (!isCapstoneUnlocked) {
                         capstone.classList.add('locked');
+                        capstone.classList.remove('unlocked');
+                        capstone.onclick = null;
                         if (!capstone.querySelector('.lock-message')) {
                             const lockMsg = document.createElement('div');
                             lockMsg.className = 'lock-message';
@@ -879,6 +993,24 @@
                             capstone.appendChild(lockMsg);
                         }
                     }
+                }
+            }
+        }
+
+        function completeCapstone(chapterId) {
+            state.completeCapstone(chapterId);
+            
+            // Re-render all chapters to update lock states
+            renderChapters();
+            
+            // Scroll to next chapter
+            const chapterIndex = seasonData.chapters.findIndex(ch => ch.id === chapterId);
+            if (chapterIndex < seasonData.chapters.length - 1) {
+                const nextChapter = document.querySelectorAll('.chapter')[chapterIndex + 1];
+                if (nextChapter) {
+                    setTimeout(() => {
+                        nextChapter.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 300);
                 }
             }
         }
